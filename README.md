@@ -1,6 +1,8 @@
 # note-app
 # Introduce this app
 This is a website that used for note-taking work, grouping for note-taking work
+# Demo
+https://github.com/webbythien/note-app/assets/54788371/27b35ac9-f4cf-4244-b6b8-a938c1ca7c30
 # Technology used
 MongoDB,
 NodeJS,
@@ -10,8 +12,6 @@ React,
 Material UI,
 # Unfixed bugs
 This is a beta version, please reload the page back to the homepage if you encounter errors during use
-# Demo
-https://github.com/webbythien/note-app/assets/54788371/27b35ac9-f4cf-4244-b6b8-a938c1ca7c30
 
 First, run the development client:
 
