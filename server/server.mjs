@@ -6,21 +6,44 @@ import bodyParser from "body-parser";
 import { expressMiddleware } from "@apollo/server/express4";
 import cors from "cors";
 const app = express();
-const httpServer = http.createServer(app);
 import "dotenv/config";
 import mongoose from "mongoose";
 import { resolvers } from "./resolvers/index.js";
 import { typeDefs } from "./schemas/index.js";
 import "./firebaseConfig.js";
 import { getAuth } from "firebase-admin/auth";
-import { log } from "console";
+import { makeExecutableSchema } from "@graphql-tools/schema";
+import { WebSocketServer } from "ws";
+import { useServer } from "graphql-ws/lib/use/ws";
 //connect to DB
 const URI = `mongodb+srv://webbythien:${process.env.DB_PASSWORD}@cluster0.d8io8ev.mongodb.net/?retryWrites=true&w=majority`;
 const PORT = process.env.PORT || 4000;
+
+const httpServer = http.createServer(app);
+const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+const wsServer = new WebSocketServer({
+  server: httpServer,
+  path: "/",
+});
+const serverCleanup = useServer({ schema }, wsServer);
+
 const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  // typeDefs,
+  // resolvers,
+  schema,
+  plugins: [
+    ApolloServerPluginDrainHttpServer({ httpServer }),
+    {
+      async serverWillStart() {
+        return {
+          async drainServer() {
+            await serverCleanup.dispose();
+          },
+        };
+      },
+    },
+  ],
 });
 
 await server.start();
@@ -33,22 +56,29 @@ const authorizationJWT = async (req, res, next) => {
       .verifyIdToken(accessToken)
       .then((decodedToken) => {
         console.log(decodedToken);
-        res.locals.uid = decodedToken.uid
+        res.locals.uid = decodedToken.uid;
         next();
-      }).catch((err)=>{
-        console.log(err);
-        return res.status(403).json({message:'Forbidden',error:err})
       })
-  }else{
-    return res.status(401).json({message:'Unauthorized'})
+      .catch((err) => {
+        console.log(err);
+        return res.status(403).json({ message: "Forbidden", error: err });
+      });
+  } else {
+    next()
+    // return res.status(401).json({ message: "Unauthorized" });
   }
 };
 
-app.use(cors(), authorizationJWT, bodyParser.json(), expressMiddleware(server,{
-  context:async({req,res})=>{
-    return {uid:res.locals.uid}
-  }
-}));
+app.use(
+  cors(),
+  authorizationJWT,
+  bodyParser.json(),
+  expressMiddleware(server, {
+    context: async ({ req, res }) => {
+      return { uid: res.locals.uid };
+    },
+  })
+);
 
 mongoose.set("strictQuery", false);
 mongoose

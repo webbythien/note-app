@@ -1,10 +1,11 @@
-import { Grid, Typography } from "@mui/material";
 import React, { useContext } from "react";
+import { Grid, Typography } from "@mui/material";
 import {Box} from '@mui/system'
 import UserMenu from "../components/UserMenu";
 import { Outlet, useLoaderData, useNavigate } from "react-router-dom";
 import FolderList from "../components/FolderList";
 import { AuthContext } from "../context/AuthProvider";
+import PushNotification from "../components/PushNotification";
 function Home() {
   const {folders}= useLoaderData();
   const {user}=useContext(AuthContext)
@@ -22,6 +23,7 @@ function Home() {
 
       <Box sx={{ display: 'flex', justifyContent: 'right', mb: '10px' }}>
         <UserMenu/>
+        <PushNotification/>
       </Box>
       
       <Grid
