@@ -32,5 +32,4 @@ yarn start
 ```
 
 ## Learn More
-Thank you hole tex for inspiring me as well as this project
-https://www.youtube.com/@holetex
+you can try clone to try to interact with s3 controller API and remember you can't use delete function because for me it's limited
