@@ -32,4 +32,5 @@ yarn start
 ```
 
 ## Learn More
-
+Thank you hole tex for inspiring me as well as this project
+https://www.youtube.com/@holetex
